@@ -1,0 +1,316 @@
+! Computational domain
+NIHALO = 3         ! size of the memory halos on each side
+NJHALO = 3
+NIGLOBAL = 800     ! grid points in the zonal directions of the physical domain
+NJGLOBAL = 400     ! grid points in the meridional directions of the physical domain
+LAYOUT = 20, 10   
+IO_LAYOUT = 1, 1
+
+NK = 1            ! number of vertical layers
+
+TOPO_CONFIG = "file"             ! read topography from the file specified by TOPO_FILE
+TOPO_FILE = "driver_4km.nc"           ! the file from which topography is read
+TOPO_VARNAME = "topo"           ! name of bathymetry variable in TOPO_FILE
+
+! Sponge config
+SPONGE = False                     ! apply sponges in the domain
+SPONGE_CONFIG = "user"            ! read sponge config from user
+
+! Horizontal grid parameters
+GRID_CONFIG = "cartesian"       ! Cartesian grid
+                                ! A character string that determines the method for
+                                ! defining the horizontal grid.  Current options are:
+                                !     mosaic - read the grid from a mosaic (supergrid)
+                                !              file set by GRID_FILE.
+                                !     cartesian - use a (flat) Cartesian grid.
+                                !     spherical - use a simple spherical grid.
+                                !     mercator - use a Mercator spherical grid.
+AXIS_UNITS = "k"                ! default = "degrees"
+                                ! The units for the Cartesian axes. Valid entries are:
+                                !     degrees - degrees of latitude and longitude
+                                !     m - meters
+                                !     k - kilometers
+SOUTHLAT = -800.0              !   [k]
+                                ! The southern latitude of the domain or the equivalent
+                                ! starting value for the y-axis.
+WESTLON = -1600.0               !   [k] default = 0.0
+                                ! The western longitude of the domain or the equivalent
+                                ! starting value for the x-axis.
+
+LENLAT = 1600.0                 !   [k]
+                                ! The latitudinal or y-direction length of the domain.
+LENLON = 3200.0                 !   [k]
+                                ! The longitudinal or x-direction length of the domain.
+
+ISOTROPIC = False                !   [Boolean] default = False
+                                ! If true, an isotropic grid on a sphere (also known as
+                                ! a Mercator grid) is used. With an isotropic grid, the
+                                ! meridional extent of the domain (LENLAT), the zonal
+                                ! extent (LENLON), and the number of grid points in each
+                                ! direction are _not_ independent. In MOM the meridional
+                                ! extent is determined to fit the zonal extent and the
+                                ! number of grid points, while grid is perfectly isotropic.
+EQUATOR_REFERENCE = False       !   [Boolean] default = True
+                                ! If true, the grid is defined to have the equator at the
+                                ! nearest q- or h- grid point to (-LOWLAT*NJGLOBAL/LENLAT).
+REENTRANT_X = True              !   [Boolean] default = True
+                                ! If true, the domain is zonally reentrant.
+REENTRANT_Y = False             !   [Boolean] default = False
+                                ! If true, the domain is meridionally reentrant.
+ 
+! Vertical grid parameters
+MAXIMUM_DEPTH = 4000.0           ! maximum depth of ocean
+MINIMUM_DEPTH = 1.0              ! anything shallower is assumed to be land
+COORD_CONFIG = "file"      ! use temperature and salinity profiles (read from COORD_FILE) to set layer densities.
+COORD_FILE = "driver_4km.nc"
+GFS = 9.8                        ! reduced gravity at the free surface
+GINT = 9.8E-03                   ! reduced gravity of internal interfaces
+THICKNESS_CONFIG = "file"       ! define layer thicknesses from ale coord
+                                 ! A string that determines how the initial layer thicknesses are specified for a new run
+THICKNESS_FILE = "driver_4km.nc"
+
+! MOM_open_boundary
+ROTATION = "betaplane"          ! default = "2omegasinlat"
+                                ! This specifies how the Coriolis parameter is specified:
+                                !     2omegasinlat - Use twice the planetary rotation rate
+                                !       times the sine of latitude.
+                                !     betaplane - Use a beta-plane or f-plane.
+                                !     USER - call a user modified routine.
+F_0 = -1.0E-04                  !   [s-1] default = 0.0
+                                ! The reference value of the Coriolis parameter with the
+                                ! betaplane option.
+BETA = 1.5E-11                  !   [m-1 s-1] default = 0.0
+                                ! The northward gradient of the Coriolis parameter with
+                                ! the betaplane option.
+
+! Physical parameters
+C_P = 3925.0       ! heat capacity of sea water
+
+! Time integration parameters
+DT = 1000.0                      ! baroclinic dynamics time step (was 1200.0s)
+DT_THERM = 1000.0               ! thermodynamcis and tracer advection time step (was 7200.0s)
+MIN_Z_DIAG_INTERVAL = 2.16E+04  ! the minimum amount of time in seconds between calculations of
+                                ! depth-space diagnostics, making this > DT_THERM reduces the performance penalty
+                                ! of regridding to depth online
+DT_FORCING = 1000.0             ! time step for changing forcing (was 7200.0s)
+DTBT = -0.98                    ! barotropic time step 
+DTBT_RESET_PERIOD = 0.0         ! the period between recalculations of DTBT (if DTBT <= 0).
+BEBT = 0.2                      ! whether barotropic time stepping uses the forward-backward time-
+                                ! stepping scheme (0) or a backward Euler scheme (1).
+                                ! ratio from forward-backward to backward Euler scheme
+
+VARIABLE_WINDS = False          !   [Boolean] default = True
+                                ! If true, the winds vary in time after the initialization.
+VARIABLE_BUOYFORCE = False      !   [Boolean] default = True
+                                ! If true, the buoyancy forcing varies in time after the
+                                ! initialization of the model.
+
+
+! Viscosity/Diffusivity parameters
+LAPLACIAN = False         ! if true, use a Laplacian horizontal viscosity
+KH_VEL_SCALE = 0.01      ! the velocity scale which is multiplied by the grid spacing 
+                         ! to calculate the Laplacian viscosity
+!AH_VEL_SCALE = 0.05     ! the velocity scale which is multiplied by the cube of the grid spacing
+                         ! to calculate the biharmonic viscosity
+SMAGORINSKY_AH = False    ! if true, use a biharmonic Smagorinsky nonlinear eddy viscosity
+SMAG_BI_CONST = 0.06     ! the nondimensional biharmonic Smagorinsky constant, typically 0.015 - 0.06
+BIHARMONIC = True  ! use a biharmonic horizontal viscosity
+AH = 1.5E+9       ! the background biharmonic horizontal viscosity
+HMIX_FIXED = 0.5   ! the prescribed depth over which the near-surface viscosity and diffusivity 
+                   ! are elevated when the bulk mixed layer is not used, unit: m.
+KV = 1.0E-04       ! the background kinematic viscosity in the interior
+KD = 0.0       ! the background diapycnal diffusivity of density in the interior
+KD_MAX = 0.0       ! the maximum permitted increment for the diapycnal diffusivity from TKE-based parameterizations
+KD_MIN = 0   ! the minimum diapycnal diffusivity 
+KHTH = 0.0        ! the background horizontal thickness diffusivity
+KHTH_MAX = 0.0   ! the maximum horizontal thickness diffusivity.
+THICKNESSDIFFUSE = False         ! if True, interface heights are diffused with a coefficent of KHTH
+THICKNESSDIFFUSE_FIRST = True    ! if true, do thickness diffusion before dynamics
+
+TKE_DECAY = 10.0                 ! The ratio of the natural Ekman depth to the TKE decay scale. 
+BBL_MIXING_AS_MAX = False        ! If true, take the maximum of the diffusivity from the BBL mixing and 
+                                 ! the other diffusivities.
+                                 ! Otherwise, diffusiviy from the BBL_mixing is simply added.
+USE_LOTW_BBL_DIFFUSIVITY = True  ! If true, uses a simple, imprecise but non-coordinate dependent, model 
+                                 ! of BBL mixing diffusivity based on Law of the Wall.
+HENYEY_IGW_BACKGROUND = False    ! If true, use a latitude-dependent scaling for the near surface background diffusivity
+                                 ! as described in Harrison & Hallberg, JPO 2008.
+N2_FLOOR_IOMEGA2 = 0.0           ! The floor applied to N2(k) scaled by Omega^2:
+                                 !  If =0., N2(k) is simply positive definite.
+                                 !  If =1., N2(k) > Omega^2 everywhere.
+INT_TIDE_DISSIPATION = False     ! If true, use an internal tidal dissipation scheme to drive diapycnal mixing, 
+                                 ! along the lines of St. Laurent et al. (2002) and Simmons et al. (2004).
+
+! Lateral mixing coeffs
+KHTH_SLOPE_CFF = 0.25      ! nondimensional coefficient in the Visbeck formula for the interface depth diffusivity
+KHTR_SLOPE_CFF = 0.25      ! nondimensional coefficient in the Visbeck formula for the epipycnal tracer diffusivity
+USE_VARIABLE_MIXING = False   ! If true, the variable mixing code will be called.
+                             ! This allows diagnostics to be created even if the scheme is not used.
+                             ! If KHTR_SLOPE_CFF>0 or  KhTh_Slope_Cff>0, 
+                             ! this is set to true regardless of what is in the parameter file.
+                             ! KHTR_SLOPE_CFF > 0, USE_VARIABLE_MIXING = True
+RESOLN_SCALED_KH = False      ! If true, the Laplacian lateral viscosity is scaled away
+                             ! when the first baroclinic deformation radius is well resolved.
+VARMIX_KTOP = 6              ! The layer number at which to start vertical integration 
+                             ! of S*N for purposes of finding the Eady growth rate
+VISBECK_L_SCALE = 3.0E+04    ! The fixed length scale in the Visbeck formula.
+
+! Bottom drag
+BOTTOMDRAGLAW = True    ! bottom stress is calculated with a drag law of the form c_drag*|u|*u
+CDRAG = 0.003                   !   [nondim] default = 0.003
+                                ! CDRAG is the drag coefficient relating the magnitude of
+                                ! the velocity field to the bottom stress. CDRAG is only
+                                ! used if BOTTOMDRAGLAW is defined.
+HBBL = 10.0             ! the thickness over which near-bottom velocities are averaged
+DRAG_BG_VEL = 0.1       ! an unresolved velocity that is combined with the resolved velocity 
+                        ! to estimate the velocity magnitude
+BBL_USE_EOS = False      ! use the equation of state in determining the properties of the bottom boundary layer
+BBL_THICK_MIN = 0.1     ! the minimum bottom boundary layer thickness that can be used with BOTTOMDRAGLAW
+CHANNEL_DRAG = False    ! free slip sides in mitgcm
+                        ! if true, the bottom drag is exerted directly on each
+                        ! layer proportional to the fraction of the bottom it overlies
+
+
+! Surface forcing
+BUOY_CONFIG = "zero"                ! read buoyancy forcing from the file
+WIND_CONFIG = "file"       ! read wind forcing from the file
+WIND_FILE = "wind.nc"   ! the file in which the wind stresses are found 
+WINDSTRESS_X_VAR = "STRESS_X"  ! the name of the x-wind stress variable in WIND_FILE
+WINDSTRESS_Y_VAR = "STRESS_Y"  ! the name of the y-wind stress variable in WIND_FILE
+WINDSTRESS_STAGGER = "A"   ! how the wind stress components are staggered in WIND_FILE
+RESTOREBUOY = False         ! the buoyancy fluxes drive the model back toward some specified surface state
+                           ! with a rate given by FLUXCONST
+FLUXCONST = 0.5            ! relates the restoring surface fluxes to the relative surface anomalies
+
+! Simulation parameters
+BOUND_SALINITY = True         ! if true, limit salinity to being positive
+BOUND_CORIOLIS = True         ! if true, the Coriolis terms at u-points are bounded by the four estimates 
+                              ! of (f+rv)v from the four neighboring v-points, and similarly at v-points
+SAVE_INITIAL_CONDS = True     ! if true, write the initial conditions to a file given by IC_OUTPUT_FILE
+                              ! IC_OUTPUT_FILE = 'MOM_IC' (default)
+MAXVEL = 6.0                  ! the maximum velocity allowed before the velocity components are truncated
+MAXTRUNC = 5000               ! the run will be stopped, and the day set to a very large value 
+                              ! if the velocity is truncated more than MAXTRUNC times between energy saves
+
+U_TRUNC_FILE = "U_velocity_truncations"
+V_TRUNC_FILE = "V_velocity_truncations"
+
+! I/O and simulation length
+ENERGYSAVEDAYS = 1.0       ! the interval in units of TIMEUNIT between saves of 
+                           ! the energies of the run and other globally summed diagnostics
+INPUTDIR = "INPUT"
+
+! EOS
+ENABLE_THERMODYNAMICS = False    !   [Boolean] default = True
+                                ! If true, Temperature and salinity are used as state
+                                ! variables.
+USE_EOS = False                  !   [Boolean] default = True
+                                ! If true,  density is calculated from temperature and
+                                ! salinity with an equation of state.  If USE_EOS is
+                                ! true, ENABLE_THERMODYNAMICS must be true as well.
+RHO_0 = 1027.810                !   [kg m-3] default = 1035.0
+                                ! The mean ocean density used with BOUSSINESQ true to
+                                ! calculate accelerations and the mass for conservation
+                                ! properties, or with BOUSSINSEQ false to convert some
+                                ! parameters from vertical units of m to kg m-2.
+
+ADIABATIC = True                !   [Boolean] default = False
+                                ! There are no diapycnal mass fluxes if ADIABATIC is
+                                ! true. This assumes that KD = KDML = 0.0 and that
+                                ! there is no buoyancy forcing, but makes the model
+                                ! faster by eliminating subroutine calls.
+
+! Tracer_flow_control
+USE_IDEAL_AGE_TRACER = False  ! if true, use the ideal_age_example tracer package
+
+! MOM_tracer_hor_diff
+KHTR = 0.0                  ! The background along-isopycnal tracer diffusivity.
+KHTR_MIN = 0.0              ! The minimum along-isopycnal tracer diffusivity.
+KHTR_MAX = 0.0             ! The maximum along-isopycnal tracer diffusivity.
+KHTR_PASSIVITY_COEFF = 3.0   ! The coefficient that scales deformation radius over grid-spacing in passivity, 
+                             ! where passivity is the ratio between along isopycnal mixing of tracers to
+                             ! thickness mixing.
+                             ! A non-zero value enables this parameterization.                             
+
+! Others 
+FRAZIL = False       ! If true, water freezes if it gets too cold, and the accumulated heat deficit 
+                    ! is returned in the surface state
+                    ! FRAZIL is only used if ENABLE_THERMODYNAMICS is True.
+USE_MEKE = False    ! If true, turns on the MEKE scheme which calculates a sub-grid 
+                    ! mesoscale eddy kinetic energy budget
+
+! Continuity PPM
+!    PPM - use a positive-definite (or monotonic)
+!          piecewise parabolic reconstruction solver.
+ETA_TOLERANCE = 1.0E-12       ! The tolerance for the differences between the barotropic and baroclinic estimates
+                              ! of the sea surface height due to the fluxes through each face.
+VELOCITY_TOLERANCE = 1.0E-04  ! The tolerance for barotropic velocity discrepancies between 
+                              ! the barotropic solution and the sum of the layer thicknesses
+
+! PressureForce_AFV (analytic finite volume)
+MASS_WEIGHT_IN_PRESSURE_GRADIENT = True ! If true, use mass weighting when interpolation T/S for 
+                                        ! top/bottom integrals in AFV pressure gradient calculation.
+
+! Barotropic
+BOUND_BT_CORRECTION = True       ! corrective pseudo mass-fluxes into the
+                                 ! barotropic solver are limited to values that
+                                 ! require less than 0.1*MAXVEL
+BT_PROJECT_VELOCITY = True       ! if true, step the barotropic velocity first and project out the velocity tendancy
+                                 ! by 1+BEBT when calculating the transport.
+BT_THICK_SCHEME = "FROM_BT_CONT" ! the scheme that is used to set the open face areas used for barotropic transport 
+                                 ! and the relative weights of the accelerations
+                                 ! use the average thicknesses kept in the h_u and h_v fields of the BT_cont_type
+
+! User defined
+USER_CHANGE_DIFFUSIVITY = True   ! If true, call user-defined code to change the diffusivity
+USER_KD_FACTOR = 19
+USER_KD_DECAY_DIST = 100.0
+
+! MOM_kappa_shear
+! Parameterization of shear-driven turbulence following Jackson, Hallberg and Legg, JPO 2008
+USE_JACKSON_PARAM = False        ! If true, use the Jackson-Hallberg-Legg (JPO 2008) shear mixing parameterization.
+MAX_RINO_IT = 25                 ! The maximum number of iterations that may be used to estimate 
+                                 ! the Richardson number driven mixing.
+
+! MOM_KPP
+! This is the MOM wrapper to CVmix:KPP
+! See http://code.google.com/p/cvmix/
+USE_KPP = False    ! If true, turns on the [CVmix] KPP scheme of Large et al., 1994,
+                   ! to calculate diffusivities and non-local transport in the OBL.
+
+! MOM_diffConvection
+USE_CONVECTION = FALSE           ! If true, turns on the diffusive convection scheme that increases diapycnal 
+                                ! diffusivities at statically unstable interfaces.
+                                ! Relevant parameters are contained in the CONVECTION% parameter block.
+CONVECTION%
+PASSIVE = False                 ! If True, puts KPP into a passive-diagnostic mode.
+KD_CONV = 100.0                 !   [m2/s] default = 1.0
+                                ! DIffusivity used in statically unstable regions of column.
+%CONVECTION
+
+! MOM_entrain_diffusive
+MAX_ENT_IT = 20                 ! The maximum number of iterations that may be used to calculate
+                                ! the interior diapycnal entrainment.
+TOLERANCE_ENT = 1.0E-05         ! The tolerance with which to solve for entrainment values.
+
+
+
+
+ARCHAIC_OMIP_FORCING_FILE = False  ! If true, use the forcing variable decomposition from 
+                                   ! the old German OMIP prescription that predated CORE.
+                                   ! If false, use the variable groupings available from MOM
+                                   ! output diagnostics of forcing variables.
+
+MAXCPU = 2.88E+04     ! The maximum amount of cpu time per processor for which MOM should run before saving a restart
+                      ! file and quiting with a return value that indicates that further execution is required to
+                      ! complete the simulation, in wall-clock seconds.
+
+RESTART_CONTROL = 3   ! An integer whose bits encode which restart files are written.
+RESTINT = 365.0       ! The time between saves of the restart file.
+
+USE_REGRIDDING = False              ! If True, use the ALE algorithm (regridding/remapping).
+BULKMIXEDLAYER = False             ! BULKMIXEDLAYER can not be used with USE_REGRIDDING.
+
+CFL_TRUNCATE_RAMP_TIME = 7200.     ! The time over which the CFL trunction value is ramped up 
+                                   ! at the beginning of the run.
+
