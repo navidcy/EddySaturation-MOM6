@@ -4,7 +4,7 @@ This repository contains setup and configuration files for Modular Ocean Model v
 
 This configuration was used for the simulations in the paper:
 
-Constantinou, N. C. and Hogg, A. McC. (2019). Eddy saturation of the Southern Ocean: a baroclinic versus barotropic perspective. *Geophys. Res. Lett.*, **46**, doi:[10.1029/2019GL084117](https://doi.org/10.1029/2019GL084117).
+Constantinou, N. C. and Hogg, A. McC. (2019). Eddy saturation of the Southern Ocean: a baroclinic versus barotropic perspective. *Geophys. Res. Lett.*, **46**, 12202–12212. doi:[10.1029/2019GL084117](https://doi.org/10.1029/2019GL084117).
 
 
 ### Repo contents:
