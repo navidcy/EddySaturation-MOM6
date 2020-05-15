@@ -1,0 +1,29 @@
+# Scheduler settings
+ncpus: 200
+walltime: 20:00:00
+runspersub: 30
+jobname: la1_t3e-0C
+project: g40
+queue: normalsl
+qsub_flags: -W umask=027
+
+# for normalbw
+platform:
+    nodesize: 32
+
+# Model settings
+model: mom6
+shortpath: /short/v45
+exe: MOM6_02Apr19 
+input: layer1_tau3e-0_manyshortridgesCorrectTopo
+
+
+#mpi:
+#    module: openmpi/1.8.8
+
+
+# Postprocessing
+collate: False
+userscripts:
+    archive: sync_output_to_gdata.sh
+
